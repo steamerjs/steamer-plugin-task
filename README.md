@@ -21,7 +21,9 @@ module.exports = {
 task
  |-- abc.js
  |-- cdf.js
-
+```
+## 并行或串行运行任务
+```javascript
 // 并行运行 dev 的命令
 steamer task dev
 start running task: steamer list
