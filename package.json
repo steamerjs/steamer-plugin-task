@@ -1,6 +1,6 @@
 {
   "name": "steamer-plugin-task",
-  "version": "2.0.1",
+  "version": "1.0.1",
   "description": "run tasks parallelly or serially",
   "main": "index.js",
   "bin": "index.js",
@@ -12,18 +12,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SteamerTeam/steamer-plugin-task.git"
+    "url": "git+https://github.com/steamerjs/steamer-plugin-task.git"
   },
   "keywords": [
     "steamer",
     "example"
   ],
-  "author": "SteamerTeam",
+  "author": "steamerjs",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/SteamerTeam/steamer-plugin-task/issues"
+    "url": "https://github.com/steamerjs/steamer-plugin-task/issues"
   },
-  "homepage": "https://github.com/SteamerTeam/steamer-plugin-task#readme",
+  "homepage": "https://github.com/steamerjs/steamer-plugin-task#readme",
   "dependencies": {
     "cross-spawn": "^5.1.0",
     "steamer-plugin": "^1.0.1"
