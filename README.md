@@ -2,6 +2,9 @@
 
 ## 任务配置
 ```javascript
+// 自动生成配置
+steamer task
+
 // .steamer/steamer-plugin-task.js
 module.exports = {
     "plugin": "steamer-plugin-task",
