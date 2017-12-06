@@ -3,10 +3,11 @@ module.exports = {
     "config": {
         "dev": {
             0: "steamer list",
-            1: "abc.js",
+            1: "cde.js",
         },
         "dist": [
             "steamer kit -l",
+            "bcd.js",
             "abc.js"
         ]
     }

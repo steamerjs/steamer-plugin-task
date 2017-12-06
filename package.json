@@ -1,6 +1,6 @@
 {
   "name": "steamer-plugin-task",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "run tasks parallelly or serially",
   "main": "index.js",
   "bin": "index.js",
@@ -26,6 +26,7 @@
   "homepage": "https://github.com/steamerjs/steamer-plugin-task#readme",
   "dependencies": {
     "cross-spawn": "^5.1.0",
+    "simple-git": "^1.84.0",
     "steamer-plugin": "^1.0.1"
   },
   "devDependencies": {

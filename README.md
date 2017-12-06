@@ -23,26 +23,54 @@ module.exports = {
 // .steamer/task
 task
  |-- abc.js
- |-- cdf.js
+ |-- bcd.js
+ |-- cde.js
+ |-- def.js
+
+// 并行任务
+// cde.js
+module.exports = function (ctx) {
+    console.log('cde');
+};
+
+// def.js
+module.exports = function (ctx) {
+    console.log('def');
+};
+
+// 串行任务
+// bcd.js
+module.exports = function(ctx, next) {
+    console.log('bcd');
+    next();
+};
+
+// abc.js, 最后一个任务无须执行next
+module.exports = function(ctx) {
+    console.log('abc');
+};
+
 ```
+
 ## 并行或串行运行任务
 ```javascript
 // 并行运行 dev 的命令
 steamer task dev
 start running task: steamer list
-start running task: abc.js
-// output from node abc.js
-finishing task: abc.js
+start running task: cde.js
+// output from node cde.js
+finishing task: cde.js
 // output from steamer list
 finishing task: steamer list
 
 // 串行运行 dist 的命令
-steamer task dist
 start running task: steamer kit -l
 // output from steamer list
-finishing task: steamer kit -l
+steamer task dist
+start running task: bcd.js
+// 1 second later
+// output from node bcd.js
 start running task: abc.js
-// output from node abc.js
-finishing task: abc.js
+// out from node abc.js
 ```
 

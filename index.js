@@ -2,7 +2,13 @@
 
 const path = require('path'),
     spawn = require('cross-spawn'),
+    git = require('simple-git'),
     SteamerPlugin = require('steamer-plugin');
+
+let bindSerialTask = (runner, cmdArr) => (ctx, next) => {
+    spawn.sync(runner, cmdArr, { stdio: 'inherit' });
+    next && next();
+}
 
 class TaskPlugin extends SteamerPlugin {
     constructor(args) {
@@ -10,6 +16,9 @@ class TaskPlugin extends SteamerPlugin {
         this.argv = args;
         this.pluginName = 'steamer-plugin-task';
         this.description = 'run tasks parallelly or serially';
+        this.git = git;
+        this.spawn = spawn;
+        this.middleware = [];
     }
 
     init(argv) {
@@ -61,27 +70,53 @@ class TaskPlugin extends SteamerPlugin {
         }
     }
 
-    // []
-    runSerialTask(tasks, taskFolderPath) {
-        let taskArr = [];
-
-        tasks.forEach((task) => {
-            let cmd = task.trim();
-
-            if (!cmd.includes(' ')) {
-                let taskPath = path.join(taskFolderPath, `${task}`);
-                this.checkTaskFile(taskPath);
-                cmd = `node ${taskPath}`;
-            }
-
+    getSerialTask(cmd, taskFolderPath) {
+        if (!cmd.includes(' ')) {
+            let taskPath = path.join(taskFolderPath, `${cmd}`);
+            this.checkTaskFile(taskPath);
+            cmd = require(taskPath);
+        }
+        else {
             let cmdArr = cmd.split(' '),
                 runner = cmdArr.splice(0, 1);
+            cmd = bindSerialTask(runner[0], cmdArr);
+        }
 
-            this.info(`start running task: ${task.trim()}`);
-            spawn.sync(runner[0], cmdArr, { stdio: 'inherit' });
-            this.info(`finishing task: ${task.trim()}`);
+        return cmd;
+    }
 
+    beforeSerialTask(ctx) {
+        
+    }
+
+    use(task, taskName) {
+        this.middleware.push({
+            task,
+            taskName
         });
+    }
+
+    run(ctx) {
+        this.middleware.reverse().reduce((next, item) => {
+            return () => {
+                this.info(`start running task: ${item.taskName}`);
+                item.task(ctx, () => {
+                    next && next();
+                });
+            };
+        }, this.beforeSerialTask(ctx))();
+    }
+
+    // []
+    runSerialTask(tasks, taskFolderPath) {
+
+        tasks.forEach((task, key) => {
+            let cmd = task.trim();
+            cmd = this.getSerialTask(cmd, taskFolderPath);
+            this.use(cmd, task.trim());
+        });
+
+        this.run(this);
     }
 
     // {}
@@ -92,30 +127,37 @@ class TaskPlugin extends SteamerPlugin {
             if (!cmd.includes(' ')) {
                 let taskPath = path.join(taskFolderPath, `${tasks[key]}`);
                 this.checkTaskFile(taskPath);
-                cmd = `node ${taskPath}`;
+                cmd = require(taskPath);
             }
 
-            let cmdArr = cmd.split(' '),
+            if (this._.isFunction(cmd)) {
+                this.info(`start running task: ${tasks[key].trim()}`);
+                cmd(this);
+                this.info(`finishing task: ${tasks[key].trim()}`);
+            }
+            else if (this._.isString(cmd)) {
+                let cmdArr = cmd.split(' '),
                 runner = cmdArr.splice(0, 1);
 
-            new Promise((resolve, reject) => {
-                this.info(`start running task: ${tasks[key].trim()}`);
-                let child = spawn(runner[0], cmdArr, { stdio: 'inherit' });
-                
-                child.on('exit', (code, signal) => {
-                    if (!code) {
-                        this.info(`finishing task: ${tasks[key].trim()}`);
-                        resolve(code);
-                    }
-                });
+                new Promise((resolve, reject) => {
+                    this.info(`start running task: ${tasks[key].trim()}`);
+                    let child = spawn(runner[0], cmdArr, { stdio: 'inherit' });
+                    
+                    child.on('exit', (code, signal) => {
+                        if (!code) {
+                            this.info(`finishing task: ${tasks[key].trim()}`);
+                            resolve(code);
+                        }
+                    });
 
-                child.on('error', (err) => {
-                    if (err) {
-                        this.error(`task error: ${err}`);
-                        reject(rer);
-                    }
-                });
-            });            
+                    child.on('error', (err) => {
+                        if (err) {
+                            this.error(`task error: ${err}`);
+                            reject(rer);
+                        }
+                    });
+                });  
+            }          
         });
     }
 

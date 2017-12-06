@@ -1,1 +1,5 @@
-console.log('abc');
+
+
+module.exports = function(ctx) {
+    console.log('abc');
+};
