@@ -1,4 +1,8 @@
-'use strict';
+/**
+ * reference:
+ * 1. http://llever.com/2017/06/13/%E4%B8%AD%E9%97%B4%E4%BB%B6js%E5%AE%9E%E7%8E%B0/
+ * 2. https://zhuanlan.zhihu.com/p/26063036
+ */
 
 const path = require('path'),
     spawn = require('cross-spawn'),
