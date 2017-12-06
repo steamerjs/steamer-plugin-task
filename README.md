@@ -9,10 +9,12 @@ steamer task
 module.exports = {
     "plugin": "steamer-plugin-task",
     "config": {
+        // 用对象写法是并行运行命令
         "dev": {
             0: "steamer list",
             1: "cde.js",
         },
+        // 用数组写法是串行运行命令
         "dist": [
             "steamer kit -l",
             "bcd.js",
