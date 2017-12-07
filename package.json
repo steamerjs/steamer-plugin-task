@@ -1,6 +1,6 @@
 {
   "name": "steamer-plugin-task",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "run tasks parallelly or serially",
   "main": "index.js",
   "bin": "index.js",

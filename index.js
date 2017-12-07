@@ -21,6 +21,9 @@ class TaskPlugin extends SteamerPlugin {
         this.argv = args;
         this.pluginName = 'steamer-plugin-task';
         this.description = 'run tasks parallelly or serially';
+        this.config = this.readSteamerDefaultConfig();
+        this.taskPrefix = this.config.TASK_PREFIX || 'steamer-task-';
+        this.npm = this.config.NPM;
         this.git = git;
         this.spawn = spawn;
         this.inquirer = inquirer;
@@ -29,6 +32,7 @@ class TaskPlugin extends SteamerPlugin {
 
     init(argv) {
         let argvs = argv || this.argv; // command argv
+        let isAdd = argvs.add || argvs.a;
 
         // 如果配置不存在，则创建
         this.checkPluginConfig();
@@ -36,17 +40,77 @@ class TaskPlugin extends SteamerPlugin {
         argvs._.shift();
         let tasks = argvs._;
 
-        if (!tasks.length) {
-            return;
-        }
-        let task = tasks[0],
-            config = this.readConfig();
+        if (tasks.length && !isAdd) {
+            let task = tasks[0],
+                config = this.readConfig();
 
-        if (!config.hasOwnProperty(task)) {
-            throw new Error(`The task '${task}' is not found.`);
+            if (!config.hasOwnProperty(task)) {
+                return this.error(`The task '${task}' is not found.`);
+            }
+
+            this.processTask(config, task);
+        }
+        else if (isAdd && isAdd !== true) {
+            this.add(isAdd);
+        }
+    }
+
+    add(task) {
+        // console.log(this.taskPrefix);
+        this.fs.ensureDir(path.join(process.cwd(), '.steamer'));
+        let taskFullName = `${this.taskPrefix}${task}`;
+        let taskPath = path.join(this.getGlobalModules(), `${taskFullName}`);
+        let taskFilePath = path.join(taskPath, '.steamer');
+        
+        if (!this.fs.existsSync(taskPath)) {
+            this.info(`Installing ${taskFullName}`);
+            spawn.sync(this.npm, ['install', '--global', taskFullName], { stdio: 'inherit' });
+        }
+        this.info(`${taskFullName} installed`);
+
+        if (!this.fs.existsSync(taskPath)) {
+            return this.error(`${taskFullName} not found.`);
         }
 
-        this.processTask(config, task);
+        let pkgJson = require(path.join(taskPath, 'package.json')),
+            dependencies = pkgJson.dependencies;
+
+        if (!this.fs.existsSync(taskFilePath)) {
+            return this.error(`Task files not found.`);
+        }
+
+        let files = this.fs.readdirSync(taskFilePath);
+        files.forEach((item) => {
+            this.fs.copySync(path.join(taskFilePath, item), path.join(process.cwd(), '.steamer', item));
+        });
+
+        dependencies = {
+            'vue': '^2.0.0',
+            'react': '^15.6.2'
+        };
+
+        let installDependencies = [];
+        Object.keys(dependencies).forEach((key) => {
+            installDependencies.push(`${key}@${dependencies[key]}`);
+        });
+
+        if (installDependencies.length) {
+            this.info(`Installing ${installDependencies.join(' ')}`);
+            let action = ['install', '--save-dev'];
+            action = action.concat(installDependencies);
+            spawn.sync(this.npm, action, { stdio: 'inherit' });
+        }
+
+        this.success('Task installed success');
+    }
+
+    getVersion(ver) {
+        ver = ver.match(/(\d+).(\d+).(\d+)/ig, '');
+        if (ver.length) {
+            return ver[0];
+        }
+
+        return '';
     }
 
     checkPluginConfig() {

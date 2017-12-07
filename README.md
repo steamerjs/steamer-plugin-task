@@ -1,5 +1,16 @@
 # steamer-plugin-task
 
+## 添加任务
+```javascript
+steamer task --add [task name]
+
+// 如：
+steamer task --add alloyteam
+// 1. 全局安装 steamer-task-alloyteam
+// 2. 将 steamer-task-alloyteam 里的 .steamer 内容全数拷贝到项目的 .steamer内
+// 3. 安装 steamer-task-alloyteam 任务所需依赖到项目中
+```
+
 ## 任务配置
 ```javascript
 // 自动生成配置
