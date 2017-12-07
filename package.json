@@ -26,6 +26,7 @@
   "homepage": "https://github.com/steamerjs/steamer-plugin-task#readme",
   "dependencies": {
     "cross-spawn": "^5.1.0",
+    "inquirer": "^4.0.1",
     "simple-git": "^1.84.0",
     "steamer-plugin": "^1.0.1"
   },

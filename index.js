@@ -7,6 +7,7 @@
 const path = require('path'),
     spawn = require('cross-spawn'),
     git = require('simple-git'),
+    inquirer = require('inquirer'),
     SteamerPlugin = require('steamer-plugin');
 
 let bindSerialTask = (runner, cmdArr) => (ctx, next) => {
@@ -22,6 +23,7 @@ class TaskPlugin extends SteamerPlugin {
         this.description = 'run tasks parallelly or serially';
         this.git = git;
         this.spawn = spawn;
+        this.inquirer = inquirer;
         this.middleware = [];
     }
 
