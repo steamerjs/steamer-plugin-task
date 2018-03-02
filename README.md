@@ -1,5 +1,10 @@
 # steamer-plugin-task
 
+[![NPM Version](https://img.shields.io/npm/v/steamer-plugin-task.svg?style=flat)](https://www.npmjs.com/package/steamer-plugin-task)
+[![Travis](https://img.shields.io/travis/steamerjs/steamer-plugin-task.svg)](https://travis-ci.org/steamerjs/steamer-plugin-task)
+[![Deps](https://david-dm.org/steamerjs/steamer-plugin-task.svg)](https://david-dm.org/steamerjs/steamer-plugin-task)
+[![Coverage](https://img.shields.io/coveralls/steamerjs/steamer-plugin-task.svg)](https://coveralls.io/github/steamerjs/steamer-plugin-task)
+
 ## 添加任务
 ```javascript
 steamer task --add [task name]
