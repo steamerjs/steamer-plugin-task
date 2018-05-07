@@ -13,7 +13,7 @@ const path = require('path'),
 let bindSerialTask = (runner, cmdArr) => (ctx, next) => {
     spawn.sync(runner, cmdArr, { stdio: 'inherit' });
     next && next();
-}
+};
 
 class TaskPlugin extends SteamerPlugin {
     constructor(args) {
@@ -264,9 +264,11 @@ class TaskPlugin extends SteamerPlugin {
                     child.on('error', (err) => {
                         if (err) {
                             this.error(`task error: ${err}`);
-                            reject(rer);
+                            reject(err);
                         }
                     });
+                }).catch((e) => {
+                    this.error(e);
                 });  
             }          
         });
@@ -277,6 +279,13 @@ class TaskPlugin extends SteamerPlugin {
      */
     help() {
         this.printUsage('run tasks parallelly or serially', 'task');
+        this.printOption([
+            {
+                option: 'add',
+                alias: 'a',
+                description: 'install task packages'
+            }
+        ]);
     }
 }
 

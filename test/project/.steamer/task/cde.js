@@ -1,5 +1,5 @@
 
 
 module.exports = function (ctx) {
-    console.log('cde');
+    ctx.log('cde');
 };

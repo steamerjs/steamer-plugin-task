@@ -1,5 +1,5 @@
 
 
 module.exports = function(ctx) {
-    console.log('abc');
+    ctx.log('abc');
 };

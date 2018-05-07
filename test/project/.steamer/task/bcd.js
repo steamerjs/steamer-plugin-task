@@ -2,7 +2,7 @@
 
 module.exports = function(ctx, next) {
     setTimeout(() => {
-        console.log('bcd');
+        ctx.log('bcd');
         next();
     }, 1000);
 };

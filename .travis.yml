@@ -1,0 +1,20 @@
+sudo: false
+language: node_js
+node_js:
+  - node
+  - 8
+  - 6
+
+cache:
+  directories:
+    - node_modules
+
+script: npm run travis
+
+before_install:
+  - export NODE_PATH=$(npm root -g)
+
+after_success:
+  - cat ./coverage/lcov.info | node_modules/.bin/coveralls --verbose
+  - cat ./coverage/coverage.json | node_modules/codecov.io/bin/codecov.io.js
+  - rm -rf ./coverage
