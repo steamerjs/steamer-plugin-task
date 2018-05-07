@@ -279,7 +279,7 @@ class TaskPlugin extends SteamerPlugin {
      * help
      */
     help() {
-        this.printUsage('run tasks parallelly or serially', 'task');
+        this.printUsage(this.description, 'task');
         this.printOption([
             {
                 option: 'add',
