@@ -55,6 +55,10 @@ class TaskPlugin extends SteamerPlugin {
         }
     }
 
+    /**
+     * add task to config
+     * @param {String} task 
+     */
     add(task) {
         // console.log(this.taskPrefix);
         this.fs.ensureDir(path.join(process.cwd(), '.steamer'));
@@ -64,7 +68,7 @@ class TaskPlugin extends SteamerPlugin {
         
         if (!this.fs.existsSync(taskPath)) {
             this.info(`Installing ${taskFullName}`);
-            spawn.sync(this.npm, ['install', '--global', taskFullName], { stdio: 'inherit' });
+            this.spawn.sync(this.npm, ['install', '--global', taskFullName], { stdio: 'inherit' });
         }
         this.info(`${taskFullName} installed`);
 
@@ -84,10 +88,10 @@ class TaskPlugin extends SteamerPlugin {
             this.fs.copySync(path.join(taskFilePath, item), path.join(process.cwd(), '.steamer', item));
         });
 
-        dependencies = {
-            'vue': '^2.0.0',
-            'react': '^15.6.2'
-        };
+        // dependencies = {
+        //     'vue': '^2.0.0',
+        //     'react': '^15.6.2'
+        // };
 
         let installDependencies = [];
         Object.keys(dependencies).forEach((key) => {
@@ -98,21 +102,28 @@ class TaskPlugin extends SteamerPlugin {
             this.info(`Installing ${installDependencies.join(' ')}`);
             let action = ['install', '--save-dev'];
             action = action.concat(installDependencies);
-            spawn.sync(this.npm, action, { stdio: 'inherit' });
+            this.spawn.sync(this.npm, action, { stdio: 'inherit' });
         }
 
         this.success('Task installed success');
     }
 
-    getVersion(ver) {
-        ver = ver.match(/(\d+).(\d+).(\d+)/ig, '');
-        if (ver.length) {
-            return ver[0];
-        }
+    /**
+     * get version
+     * @param {String} ver 
+     */
+    // getVersion(ver) {
+    //     ver = ver.match(/(\d+).(\d+).(\d+)/ig, '');
+    //     if (ver.length) {
+    //         return ver[0];
+    //     }
 
-        return '';
-    }
+    //     return '';
+    // }
 
+    /**
+     * check whether plugin config file is avaiable or not
+     */
     checkPluginConfig() {
         let configPath = path.join(process.cwd(), './.steamer/steamer-plugin-task.js');
         if (!this.fs.existsSync(configPath)) {
@@ -122,12 +133,21 @@ class TaskPlugin extends SteamerPlugin {
         }
     }
 
+    /**
+     * check whether task path is available or not
+     * @param {String} taskPath 
+     */
     checkTaskFile(taskPath) {
         if (!this.fs.existsSync(taskPath)) {
             throw new Error(`${taskPath} is not found.`);
         }
     }
 
+    /**
+     * 
+     * @param {Object} config 
+     * @param {Array} task 
+     */
     processTask(config, task) {
         let taskFolderPath = path.join(process.cwd(), './.steamer/task/');
         
@@ -140,6 +160,11 @@ class TaskPlugin extends SteamerPlugin {
         }
     }
 
+    /**
+     * get serial tasks
+     * @param {String} cmd command
+     * @param {String} taskFolderPath task files folder
+     */
     getSerialTask(cmd, taskFolderPath) {
         if (!cmd.includes(' ')) {
             let taskPath = path.join(taskFolderPath, `${cmd}`);
@@ -155,9 +180,8 @@ class TaskPlugin extends SteamerPlugin {
         return cmd;
     }
 
-    beforeSerialTask(ctx) {
-        
-    }
+    // 用作头个任务的next占位
+    beforeSerialTask(ctx) {}
 
     use(task, taskName) {
         this.middleware.push({
@@ -166,6 +190,10 @@ class TaskPlugin extends SteamerPlugin {
         });
     }
 
+    /**
+     * run tasks
+     * @param {Object} ctx context
+     */
     run(ctx) {
         this.middleware.reverse().reduce((next, item) => {
             return () => {
@@ -178,6 +206,11 @@ class TaskPlugin extends SteamerPlugin {
     }
 
     // []
+    /**
+     * run serial tasks
+     * @param {Array} tasks tasks array
+     * @param {String} taskFolderPath task files folder
+     */
     runSerialTask(tasks, taskFolderPath) {
 
         tasks.forEach((task, key) => {
@@ -190,6 +223,11 @@ class TaskPlugin extends SteamerPlugin {
     }
 
     // {}
+    /**
+     * run parallel task
+     * @param {Array} tasks tasks array
+     * @param {String} taskFolderPath task files folder
+     */
     runParallelTask(tasks, taskFolderPath) {
         Object.keys(tasks).forEach((key) => {
             let cmd = tasks[key].trim();
@@ -211,12 +249,15 @@ class TaskPlugin extends SteamerPlugin {
 
                 new Promise((resolve, reject) => {
                     this.info(`start running task: ${tasks[key].trim()}`);
-                    let child = spawn(runner[0], cmdArr, { stdio: 'inherit' });
+                    let child = this.spawn(runner[0], cmdArr, { stdio: 'inherit' });
                     
                     child.on('exit', (code, signal) => {
                         if (!code) {
                             this.info(`finishing task: ${tasks[key].trim()}`);
                             resolve(code);
+                        }
+                        else {
+                            reject(code);
                         }
                     });
 
@@ -231,6 +272,9 @@ class TaskPlugin extends SteamerPlugin {
         });
     }
 
+    /**
+     * help
+     */
     help() {
         this.printUsage('run tasks parallelly or serially', 'task');
     }

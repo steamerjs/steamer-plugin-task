@@ -17,6 +17,10 @@ steamer task --add alloyteam
 steamer task
 
 // .steamer/steamer-plugin-task.js
+/**
+ * 如果 task 是一个文件路径字符串，并且存在，文件会被 require 之后，执行
+ * 如果 task 是字符串且中间有空格分割，task 会被解析成命令行，直接用 spawn 执行
+ */
 module.exports = {
     "plugin": "steamer-plugin-task",
     "config": {
