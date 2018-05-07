@@ -75,9 +75,15 @@ class TaskPlugin extends SteamerPlugin {
         if (!this.fs.existsSync(taskPath)) {
             return this.error(`${taskFullName} not found.`);
         }
-
-        let pkgJson = require(path.join(taskPath, 'package.json')),
-            dependencies = pkgJson.dependencies;
+        
+        let pkgJsonPath = path.join(taskPath, 'package.json');
+        let pkgJson = {};
+        
+        if (this.fs.existsSync(pkgJsonPath)) {
+            pkgJson = require(path.join(taskPath, 'package.json'));
+        }
+        
+        let dependencies = pkgJson.dependencies || {};
 
         if (!this.fs.existsSync(taskFilePath)) {
             return this.error(`Task files not found.`);
@@ -87,11 +93,6 @@ class TaskPlugin extends SteamerPlugin {
         files.forEach((item) => {
             this.fs.copySync(path.join(taskFilePath, item), path.join(process.cwd(), '.steamer', item));
         });
-
-        // dependencies = {
-        //     'vue': '^2.0.0',
-        //     'react': '^15.6.2'
-        // };
 
         let installDependencies = [];
         Object.keys(dependencies).forEach((key) => {
