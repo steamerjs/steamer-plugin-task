@@ -80,7 +80,7 @@ class TaskPlugin extends SteamerPlugin {
         let pkgJson = {};
         
         if (this.fs.existsSync(pkgJsonPath)) {
-            pkgJson = require(path.join(taskPath, 'package.json'));
+            pkgJson = require(pkgJsonPath);
         }
         
         let dependencies = pkgJson.dependencies || {};

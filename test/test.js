@@ -39,9 +39,11 @@ describe('add', function() {
 
         let existCount = 0;
         let existsSyncStub = sinon.stub(task.fs, 'existsSync').callsFake((taskPath) => {
-            // console.log(taskPath, taskPath.includes('steamer-plugin-task.js'));
             if (!existCount && taskPath.includes('node_modules/steamer-task-alloyteam')) {
                 existCount++;
+                return false;
+            }
+            if (taskPath.includes('package.json')) {
                 return false;
             }
             return true;
@@ -64,6 +66,9 @@ describe('add', function() {
             }
             copyCount++;
         });
+        let readdirSyncStub = sinon.stub(task.fs, 'readdirSync').callsFake((dirPath) => {
+            return ['steamer-plugin-jb.js', 'steamer-plugin-task.js', 'task'];
+        });
         let infoStub = sinon.stub(task, 'info');
         let successStub = sinon.stub(task, 'success');
 
@@ -81,6 +86,7 @@ describe('add', function() {
         coppySyncStub.restore();
         infoStub.restore();
         successStub.restore();
+        readdirSyncStub.restore();
     });
 });
 
